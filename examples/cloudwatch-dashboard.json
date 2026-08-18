@@ -1,0 +1,181 @@
+{
+  "widgets": [
+    {
+      "type": "text", "x": 0, "y": 0, "width": 24, "height": 1,
+      "properties": { "markdown": "## Service health — is it working?" }
+    },
+    {
+      "type": "metric", "x": 0, "y": 1, "width": 6, "height": 6,
+      "properties": {
+        "title": "Requests / min",
+        "region": "eu-west-1", "stat": "Sum", "period": 60,
+        "metrics": [["AWS/ApplicationELB", "RequestCount", "LoadBalancer", "app/saa-p1-alb/0000000000000000"]]
+      }
+    },
+    {
+      "type": "metric", "x": 6, "y": 1, "width": 6, "height": 6,
+      "properties": {
+        "title": "5xx rate",
+        "region": "eu-west-1", "period": 60,
+        "metrics": [
+          [{ "expression": "IF(m2>0, m1/m2*100, 0)", "label": "5xx %", "id": "e1" }],
+          ["AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", "LoadBalancer", "app/saa-p1-alb/0000000000000000", { "id": "m1", "visible": false, "stat": "Sum" }],
+          ["AWS/ApplicationELB", "RequestCount", "LoadBalancer", "app/saa-p1-alb/0000000000000000", { "id": "m2", "visible": false, "stat": "Sum" }]
+        ],
+        "yAxis": { "left": { "min": 0 } },
+        "annotations": { "horizontal": [{ "label": "alarm", "value": 1 }] }
+      }
+    },
+    {
+      "type": "metric", "x": 12, "y": 1, "width": 6, "height": 6,
+      "properties": {
+        "title": "Latency p95 (s)",
+        "region": "eu-west-1", "stat": "p95", "period": 60,
+        "metrics": [["AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "app/saa-p1-alb/0000000000000000"]],
+        "annotations": { "horizontal": [{ "label": "SLO 1s", "value": 1 }] }
+      }
+    },
+    {
+      "type": "metric", "x": 18, "y": 1, "width": 6, "height": 6,
+      "properties": {
+        "title": "Healthy vs unhealthy targets",
+        "region": "eu-west-1", "stat": "Average", "period": 60,
+        "metrics": [
+          ["AWS/ApplicationELB", "HealthyHostCount", "TargetGroup", "targetgroup/saa-p1-tg/0000000000000000", "LoadBalancer", "app/saa-p1-alb/0000000000000000"],
+          [".", "UnHealthyHostCount", ".", ".", ".", "."]
+        ],
+        "annotations": { "horizontal": [{ "label": "min 2", "value": 2 }] }
+      }
+    },
+
+    {
+      "type": "text", "x": 0, "y": 7, "width": 24, "height": 1,
+      "properties": { "markdown": "## Compute — why not?" }
+    },
+    {
+      "type": "metric", "x": 0, "y": 8, "width": 6, "height": 6,
+      "properties": {
+        "title": "ASG capacity",
+        "region": "eu-west-1", "stat": "Average", "period": 60,
+        "metrics": [
+          ["AWS/AutoScaling", "GroupInServiceInstances", "AutoScalingGroupName", "saa-p1-asg"],
+          [".", "GroupDesiredCapacity", ".", "."]
+        ]
+      }
+    },
+    {
+      "type": "metric", "x": 6, "y": 8, "width": 6, "height": 6,
+      "properties": {
+        "title": "Average CPU (scaling target 50%)",
+        "region": "eu-west-1", "stat": "Average", "period": 60,
+        "metrics": [["AWS/EC2", "CPUUtilization", "AutoScalingGroupName", "saa-p1-asg"]],
+        "annotations": { "horizontal": [{ "label": "target 50%", "value": 50 }] }
+      }
+    },
+    {
+      "type": "metric", "x": 12, "y": 8, "width": 6, "height": 6,
+      "properties": {
+        "title": "CPU credit balance (t3 throttling risk)",
+        "region": "eu-west-1", "stat": "Average", "period": 300,
+        "metrics": [["AWS/EC2", "CPUCreditBalance", "AutoScalingGroupName", "saa-p1-asg"]],
+        "annotations": { "horizontal": [{ "label": "alarm", "value": 20 }] }
+      }
+    },
+    {
+      "type": "metric", "x": 18, "y": 8, "width": 6, "height": 6,
+      "properties": {
+        "title": "Memory and disk (CloudWatch Agent)",
+        "region": "eu-west-1", "stat": "Average", "period": 60,
+        "metrics": [
+          ["CWAgent", "mem_used_percent", "AutoScalingGroupName", "saa-p1-asg"],
+          ["CWAgent", "disk_used_percent", "AutoScalingGroupName", "saa-p1-asg", "path", "/"]
+        ]
+      }
+    },
+
+    {
+      "type": "text", "x": 0, "y": 14, "width": 24, "height": 1,
+      "properties": { "markdown": "## Database" }
+    },
+    {
+      "type": "metric", "x": 0, "y": 15, "width": 6, "height": 6,
+      "properties": {
+        "title": "RDS CPU",
+        "region": "eu-west-1", "stat": "Average", "period": 60,
+        "metrics": [["AWS/RDS", "CPUUtilization", "DBInstanceIdentifier", "saa-p1-mysql"]]
+      }
+    },
+    {
+      "type": "metric", "x": 6, "y": 15, "width": 6, "height": 6,
+      "properties": {
+        "title": "Connections",
+        "region": "eu-west-1", "stat": "Average", "period": 60,
+        "metrics": [["AWS/RDS", "DatabaseConnections", "DBInstanceIdentifier", "saa-p1-mysql"]]
+      }
+    },
+    {
+      "type": "metric", "x": 12, "y": 15, "width": 6, "height": 6,
+      "properties": {
+        "title": "Freeable memory",
+        "region": "eu-west-1", "stat": "Average", "period": 60,
+        "metrics": [["AWS/RDS", "FreeableMemory", "DBInstanceIdentifier", "saa-p1-mysql"]]
+      }
+    },
+    {
+      "type": "metric", "x": 18, "y": 15, "width": 6, "height": 6,
+      "properties": {
+        "title": "Free storage",
+        "region": "eu-west-1", "stat": "Average", "period": 300,
+        "metrics": [["AWS/RDS", "FreeStorageSpace", "DBInstanceIdentifier", "saa-p1-mysql"]],
+        "annotations": { "horizontal": [{ "label": "2 GB", "value": 2000000000 }] }
+      }
+    },
+
+    {
+      "type": "text", "x": 0, "y": 21, "width": 24, "height": 1,
+      "properties": { "markdown": "## Edge — CloudFront and WAF metrics live in us-east-1" }
+    },
+    {
+      "type": "metric", "x": 0, "y": 22, "width": 8, "height": 6,
+      "properties": {
+        "title": "CloudFront requests",
+        "region": "us-east-1", "stat": "Sum", "period": 300,
+        "metrics": [["AWS/CloudFront", "Requests", "DistributionId", "E000000000000", "Region", "Global"]]
+      }
+    },
+    {
+      "type": "metric", "x": 8, "y": 22, "width": 8, "height": 6,
+      "properties": {
+        "title": "Cache hit rate (%)",
+        "region": "us-east-1", "stat": "Average", "period": 300,
+        "metrics": [["AWS/CloudFront", "CacheHitRate", "DistributionId", "E000000000000", "Region", "Global"]],
+        "annotations": { "horizontal": [{ "label": "target 90%", "value": 90 }] }
+      }
+    },
+    {
+      "type": "metric", "x": 16, "y": 22, "width": 8, "height": 6,
+      "properties": {
+        "title": "WAF blocked requests",
+        "region": "us-east-1", "stat": "Sum", "period": 300,
+        "metrics": [
+          ["AWS/WAFV2", "BlockedRequests", "WebACL", "saa-p1-web-acl", "Region", "CloudFront", "Rule", "ALL"],
+          [".", "CountedRequests", ".", ".", ".", ".", ".", "."]
+        ]
+      }
+    },
+
+    {
+      "type": "alarm", "x": 0, "y": 28, "width": 24, "height": 4,
+      "properties": {
+        "title": "Alarm status",
+        "alarms": [
+          "arn:aws:cloudwatch:eu-west-1:111122223333:alarm:saa-p1-healthy-hosts",
+          "arn:aws:cloudwatch:eu-west-1:111122223333:alarm:saa-p1-5xx-rate",
+          "arn:aws:cloudwatch:eu-west-1:111122223333:alarm:saa-p1-latency-p95",
+          "arn:aws:cloudwatch:eu-west-1:111122223333:alarm:saa-p1-rds-cpu",
+          "arn:aws:cloudwatch:eu-west-1:111122223333:alarm:saa-p1-rds-storage"
+        ]
+      }
+    }
+  ]
+}

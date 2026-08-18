@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Graphviz intermediate output
+*.gv
+*.dot
+
+# draw.io backups
+*.bkp
+*.dtmp
+
+# Local AWS state and secrets — never commit these
+.env
+*.pem
+*.key
+credentials
+aws-exports.js
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
