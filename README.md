@@ -1,4 +1,4 @@
-# Project 1 — Scalable Web Application with ALB and Auto Scaling
+# Scalable Web Application with ALB and Auto Scaling
 
 A production-grade, EC2-based web application reference architecture on AWS: a purpose-built
 VPC spanning two Availability Zones, an internet-facing Application Load Balancer fronted by
